@@ -3,7 +3,8 @@
  *  - make design look good
  *  - AC % +/- buttons
  *  - cut off really long numbers
- *
+ *  - clean up display variable everywhere
+ *  - only allow one decimal number
  */
 
 function add(value1, value2) {
@@ -29,14 +30,13 @@ function makeEventListeners() {
   buttons.forEach(button => {
     button.addEventListener("click", () => {
       operate(button);
-      printDisplay(display);
     });
   });
 }
 
 let equation = [];
 console.log(equation);
-printDisplay(display);
+printDisplay(display, false);
 
 function operate(input) {
   const maxLength = 10;
@@ -62,13 +62,14 @@ function operate(input) {
    *      - If the first value is undefined, set first value to be the input
    */
 
+  let dividebyZero = false;
   if(inputType === "number") {
     inputNumber(input, maxLength);
   } else if(inputType === "operator") {
     inputOperator(input);
   } else if(inputType === "equals") {
     if(equation[0] !== undefined && equation[1] !== undefined && equation[2] !== undefined) {
-      evaluate();
+      dividebyZero = evaluate();
     }
   } else if(inputType === "ac") {
     equation.splice(0, equation.length)
@@ -76,6 +77,11 @@ function operate(input) {
     backspace();
   }
 
+  if(dividebyZero) {
+    printDisplay(display, "Divide by zero");
+  } else {
+    printDisplay(display);
+  }
   console.log(equation);
 }
 
@@ -126,14 +132,14 @@ function inputOperator(input) {
     } else {
       // first and second values have been input
       // evaluate equation, then set answer to first value, and the selected operator to equation[1]
-      // do later
-      evaluate(equation);
+      evaluate();
       equation[1] = input.innerText;
     }
   }
 }
 
 function evaluate() {
+  let dividedByZero = false;
 
   let answer;
   if(equation[1] === "+") {
@@ -143,27 +149,42 @@ function evaluate() {
   } else if(equation[1] === "*") {
     answer = multiply(equation[0], equation[2]);
   } else if(equation[1] === "/") {
-    answer = divide(equation[0], equation[2]);
+    if(equation[2] === "0") {
+      // Clear the array
+      // Print cranky message about dividing by 0
+      equation.splice(0, equation.length);
+      dividedByZero = true;
+      return dividedByZero;
+    } else {
+      answer = divide(equation[0], equation[2]);
+    }
   }
 
-  equation[0] = answer.toString();
-  equation.splice(1, 2);
-
+  if(!dividedByZero) {
+    equation[0] = answer.toString();
+    equation.splice(1, 2);
+  }
+  
 }
 
-function printDisplay(displayElement) {
+function printDisplay(displayElement, customMessage) {
   outputStr = "";
 
-  if(equation[0] === undefined && equation[1] === undefined && equation[2] === undefined) {
-    outputStr = "0";
-    displayElement.innerText = outputStr;
+  if(customMessage !== false && customMessage !== undefined) {
+    outputStr = customMessage;
+  } else {
+    if(equation[0] === undefined && equation[1] === undefined && equation[2] === undefined) {
+      outputStr = "0";
+      displayElement.innerText = outputStr;
+    }
+
+    if(equation[0] !== undefined) outputStr += equation[0];
+    outputStr += " ";
+    if(equation[1] !== undefined) outputStr += equation[1];
+    outputStr += " ";
+    if(equation[2] !== undefined) outputStr += equation[2];
   }
 
-  if(equation[0] !== undefined) outputStr += equation[0];
-  outputStr += " ";
-  if(equation[1] !== undefined) outputStr += equation[1];
-  outputStr += " ";
-  if(equation[2] !== undefined) outputStr += equation[2];
   displayElement.innerText = outputStr;
 }
 
