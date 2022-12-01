@@ -1,3 +1,13 @@
+/*
+ * To do:
+ *  - make design look good
+ *  - AC % +/- buttons
+ *  - cut off really long numbers
+ *  - add a limit to length of numbers that can be input
+ *  - add a backspace button
+ *
+ */
+
 function add(value1, value2) {
   return parseFloat(value1) + parseFloat(value2);
 }
@@ -16,25 +26,32 @@ function divide(value1, value2) {
 
 function makeEventListeners() {
   const buttons = document.querySelectorAll(".button");
+  const display = document.querySelector("#display");
   
   buttons.forEach(button => {
     button.addEventListener("click", () => {
       operate(button);
+      printDisplay(display);
     });
   });
 }
 
 let equation = [];
 console.log(equation);
+printDisplay(display);
+
 function operate(input) {
+  const maxLength = 10;
 
   let inputType;
   if(input.classList.contains("number")) {
     inputType = "number";
   } else if(input.classList.contains("operator")) {
     inputType = "operator";
-  } else if(input.id === "=") {
+  } else if(input.id === "equals") {
     inputType = "equals";
+  } else {
+    inputType = input.id;
   }
 
   /*
@@ -48,44 +65,52 @@ function operate(input) {
    */
 
   if(inputType === "number") {
-    if(equation[2] === undefined) {
-      if(equation[1] === undefined) {
-        if(equation[0] === undefined) {
-          equation[0] = input.innerText;
-        } else {
-          equation[0] += input.innerText;
-        }
-      } else {
-        equation[2] = input.innerText;
-      }
-    } else {
-      equation[2] += input.innerText;
-    }
-
+    inputNumber(input, maxLength);
   } else if(inputType === "operator") {
-    if(equation[0] !== undefined) {
-      if(equation[2] === undefined) {
-        // only first value has been input
-        // set equation[1] to the operator
-        equation[1] = input.innerText;
-      } else {
-        // first and second values have been input
-        // evaluate equation, then set answer to first value, and the selected operator to equation[1]
-        // do later
-        evaluate(equation);
-        equation[1] = input.innerText;
-      }
-    }
-
+    inputOperator(input);
   } else if(inputType === "equals") {
-
     if(equation[0] !== undefined && equation[1] !== undefined && equation[2] !== undefined) {
       evaluate();
     }
-
+  } else if(inputType === "ac") {
+    equation.splice(0, equation.length)
+  } else if(inputType === "backspace") {
+    backspace();
   }
 
   console.log(equation);
+}
+
+function inputNumber(input, maxLength) {
+  if(equation[2] === undefined) {
+    if(equation[1] === undefined) {
+      if(equation[0] === undefined) {
+        equation[0] = input.innerText;
+      } else {
+        if(equation[0].length < maxLength) equation[0] += input.innerText;
+      }
+    } else {
+      equation[2] = input.innerText;
+    }
+  } else {
+    if(equation[2].length < maxLength) equation[2] += input.innerText;
+  }
+}
+
+function inputOperator(input) {
+  if(equation[0] !== undefined) {
+    if(equation[2] === undefined) {
+      // only first value has been input
+      // set equation[1] to the operator
+      equation[1] = input.innerText;
+    } else {
+      // first and second values have been input
+      // evaluate equation, then set answer to first value, and the selected operator to equation[1]
+      // do later
+      evaluate(equation);
+      equation[1] = input.innerText;
+    }
+  }
 }
 
 function evaluate() {
@@ -104,6 +129,22 @@ function evaluate() {
   equation[0] = answer.toString();
   equation.splice(1, 2);
 
+}
+
+function printDisplay(displayElement) {
+  outputStr = "";
+
+  if(equation[0] === undefined && equation[1] === undefined && equation[2] === undefined) {
+    outputStr = "0";
+    displayElement.innerText = outputStr;
+  }
+
+  if(equation[0] !== undefined) outputStr += equation[0];
+  outputStr += " ";
+  if(equation[1] !== undefined) outputStr += equation[1];
+  outputStr += " ";
+  if(equation[2] !== undefined) outputStr += equation[2];
+  displayElement.innerText = outputStr;
 }
 
 //calculator();
