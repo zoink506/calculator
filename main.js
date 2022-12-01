@@ -3,8 +3,6 @@
  *  - make design look good
  *  - AC % +/- buttons
  *  - cut off really long numbers
- *  - add a limit to length of numbers that can be input
- *  - add a backspace button
  *
  */
 
@@ -79,6 +77,28 @@ function operate(input) {
   }
 
   console.log(equation);
+}
+
+function backspace() {
+  if(equation[0] !== undefined) {
+    const latestEntry = equation[equation.length-1];
+    console.log(`Latest entry: ${latestEntry}`);
+
+    if(latestEntry.length > 1) {
+      let str = removeStrIndex(latestEntry, latestEntry.length-1);
+      equation[equation.length-1] = str;
+    } else {
+      // delete latestEntry
+      equation.splice(equation.length-1, equation.length);
+    }
+  }
+}
+
+function removeStrIndex(str, index) {
+  // "doggy", 1
+  // "d" + "ggy"
+  str = str.slice(0, index) + str.slice(index+1, str.length);
+  return str;
 }
 
 function inputNumber(input, maxLength) {
