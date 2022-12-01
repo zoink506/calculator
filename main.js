@@ -72,15 +72,38 @@ function operate(input) {
         // first and second values have been input
         // evaluate equation, then set answer to first value, and the selected operator to equation[1]
         // do later
+        evaluate(equation);
+        equation[1] = input.innerText;
       }
     }
 
   } else if(inputType === "equals") {
 
+    if(equation[0] !== undefined && equation[1] !== undefined && equation[2] !== undefined) {
+      evaluate();
+    }
 
   }
 
   console.log(equation);
+}
+
+function evaluate() {
+
+  let answer;
+  if(equation[1] === "+") {
+    answer = add(equation[0], equation[2]);
+  } else if(equation[1] === "-") {
+    answer = subtract(equation[0], equation[2]);
+  } else if(equation[1] === "*") {
+    answer = multiply(equation[0], equation[2]);
+  } else if(equation[1] === "/") {
+    answer = divide(equation[0], equation[2]);
+  }
+
+  equation[0] = answer.toString();
+  equation.splice(1, 2);
+
 }
 
 //calculator();
