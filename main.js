@@ -5,6 +5,8 @@
  *  - cut off really long numbers
  *  - clean up display variable everywhere
  *  - only allow one decimal number
+ *  - make it so that after equals has been clicked if a number if pressed it overwrite equation[0] instead of adding to it
+ *  - divide by zero doesn't work when operator is pressed instead of equals sign
  */
 
 function add(value1, value2) {
@@ -30,6 +32,7 @@ function makeEventListeners() {
   buttons.forEach(button => {
     button.addEventListener("click", () => {
       operate(button);
+      //printDisplay(display, false);
     });
   });
 }
@@ -40,6 +43,7 @@ printDisplay(display, false);
 
 function operate(input) {
   const maxLength = 10;
+  let dividebyZero = false;
 
   let inputType;
   if(input.classList.contains("number")) {
@@ -62,11 +66,10 @@ function operate(input) {
    *      - If the first value is undefined, set first value to be the input
    */
 
-  let dividebyZero = false;
   if(inputType === "number") {
     inputNumber(input, maxLength);
   } else if(inputType === "operator") {
-    inputOperator(input);
+    dividebyZero = inputOperator(input);
   } else if(inputType === "equals") {
     if(equation[0] !== undefined && equation[1] !== undefined && equation[2] !== undefined) {
       dividebyZero = evaluate();
@@ -125,6 +128,13 @@ function inputNumber(input, maxLength) {
 
 function inputOperator(input) {
   if(equation[0] !== undefined) {
+
+    if(equation[1] === "/" && equation[2] === "0") {
+      // dividing by zero, do not allow
+      evaluate();
+      return true;
+    }
+
     if(equation[2] === undefined) {
       // only first value has been input
       // set equation[1] to the operator
@@ -154,7 +164,6 @@ function evaluate() {
       // Print cranky message about dividing by 0
       equation.splice(0, equation.length);
       dividedByZero = true;
-      return dividedByZero;
     } else {
       answer = divide(equation[0], equation[2]);
     }
@@ -164,7 +173,8 @@ function evaluate() {
     equation[0] = answer.toString();
     equation.splice(1, 2);
   }
-  
+
+  return dividedByZero;
 }
 
 function printDisplay(displayElement, customMessage) {
