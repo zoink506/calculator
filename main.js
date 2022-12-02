@@ -78,6 +78,12 @@ function operate(input) {
     equation.splice(0, equation.length)
   } else if(inputType === "backspace") {
     backspace();
+  } else if(inputType === "negative") {
+    // Make the most recent number the opposite charge (name???) 
+    negative();
+  } else if(inputType === "percent") {
+    // Turn the most recent number into a percentage
+    percentage();
   }
 
   if(dividebyZero) {
@@ -175,6 +181,33 @@ function evaluate() {
   }
 
   return dividedByZero;
+}
+
+function negative() {
+  const index = findLastIndex(equation);
+  
+
+}
+
+function percentage() {
+  const index = findLastIndex(equation);
+
+}
+
+function findLastIndex(arr) {
+  // returns undefined if the array is empty
+  let lastIndex;
+  if(arr[0] !== undefined) {
+    lastIndex = 0;
+    if(arr[1] !== undefined) {
+      lastIndex = 1;
+      if(arr[2] !== undefined) {
+        lastIndex = 2;
+      }
+    }
+  }
+
+  return lastIndex;
 }
 
 function printDisplay(displayElement, customMessage) {
