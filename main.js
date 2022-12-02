@@ -1,9 +1,6 @@
 /*
  * To do:
- *  - cut off really long numbers
- *  - only allow one decimal number
- *  - make it so that after equals has been clicked if a number if pressed it overwrite equation[0] instead of adding to it
- *  - divide by zero doesn't work when operator is pressed instead of equals sign
+ * - ALL DONE :))))
  */
 
 function add(value1, value2) {
@@ -35,6 +32,7 @@ function makeEventListeners() {
 }
 
 let equation = [];
+let pressedEquals = false;
 console.log(equation);
 printDisplay(display, false);
 
@@ -66,10 +64,12 @@ function operate(input) {
   if(inputType === "number") {
     inputNumber(input, maxLength);
   } else if(inputType === "operator") {
+    pressedEquals = false;
     dividebyZero = inputOperator(input);
   } else if(inputType === "equals") {
     if(equation[0] !== undefined && equation[1] !== undefined && equation[2] !== undefined) {
       dividebyZero = evaluate();
+      pressedEquals = true;
     }
   } else if(inputType === "ac") {
     equation.splice(0, equation.length)
@@ -88,6 +88,7 @@ function operate(input) {
   } else {
     printDisplay(display);
   }
+
   console.log(equation);
 }
 
@@ -119,12 +120,21 @@ function inputNumber(input, maxLength) {
       if(equation[0] === undefined) {
         equation[0] = input.innerText;
       } else {
-        if(equation[0].length < maxLength) equation[0] += input.innerText;
+        if(!pressedEquals) {
+          if(input.id === "dot" && equation[0].includes(".")) return;
+
+          if(equation[0].length < maxLength) equation[0] += input.innerText;
+        } else {
+          equation[0] = input.innerText;
+          pressedEquals = false;
+        }
       }
     } else {
       equation[2] = input.innerText;
     }
   } else {
+    if(input.id === "dot" && equation[2].includes(".")) return;
+
     if(equation[2].length < maxLength) equation[2] += input.innerText;
   }
 }
@@ -185,16 +195,11 @@ function negative() {
 
   if(index !== 1 && index !== undefined) {
     let number = parseFloat(equation[index]);
-    console.log(`number1: ${number}`);
-
     number -= (number * 2);
-
     equation[index] = number.toString();
-    console.log(`number2: ${number}`);
   } else {
     return;
   }
-
 }
 
 function percentage() {
