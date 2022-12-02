@@ -1,6 +1,7 @@
 /*
  * To do:
- * - ALL DONE :))))
+ * - Fix bug after a value is divided by 0, and the next value is overridde when it shouldn't be
+ * - Doesn't happen when operator is used, happens when equals is used
  */
 
 function add(value1, value2) {
